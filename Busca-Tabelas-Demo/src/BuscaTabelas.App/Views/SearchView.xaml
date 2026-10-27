@@ -1,0 +1,513 @@
+<UserControl x:Class="BuscaTabelas.App.Views.SearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:BuscaTabelas.App.ViewModels"
+             xmlns:behaviors="clr-namespace:BuscaTabelas.App.Behaviors"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:SearchViewModel}"
+             d:DesignWidth="1048" d:DesignHeight="800">
+
+    <UserControl.Resources>
+        <!-- Selo do tipo de resultado: tabelas em laranja suave, colunas em azul suave -->
+        <Style x:Key="KindPill" TargetType="Border" BasedOn="{StaticResource Pill}">
+            <Setter Property="Padding" Value="8,1" />
+            <Setter Property="Background" Value="{DynamicResource Brush.AccentSubtle}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Accent}" />
+            <Setter Property="TextElement.FontSize" Value="11.5" />
+            <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+        </Style>
+        <Style x:Key="KindPill.Column" TargetType="Border" BasedOn="{StaticResource KindPill}">
+            <Setter Property="Background" Value="{DynamicResource Brush.InfoSubtle}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Info}" />
+        </Style>
+
+        <!-- Células da tabela de colunas -->
+        <Style x:Key="Cell" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
+        <Style x:Key="HeaderCell" TargetType="TextBlock" BasedOn="{StaticResource Text.Overline}">
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
+
+        <!-- Linha da tabela de colunas: seleção múltipla (Ctrl/Shift), sem cantos arredondados -->
+        <Style x:Key="ColumnRow" TargetType="ListBoxItem">
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Root" Background="Transparent" BorderBrush="{DynamicResource Brush.SurfaceHover}"
+                                BorderThickness="0,0,0,1" Padding="22,0" MinHeight="38">
+                            <Grid>
+                                <Border x:Name="Indicator" Width="3" HorizontalAlignment="Left" Margin="-22,0,0,0"
+                                        Background="{DynamicResource Brush.Accent}" Visibility="Collapsed" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{DynamicResource Brush.SurfaceAlt}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{DynamicResource Brush.AccentSubtle}" />
+                                <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Larguras das colunas da tabela (cabeçalho e linhas) -->
+        <GridLength x:Key="Col.Name">1.5*</GridLength>
+        <GridLength x:Key="Col.Type">92</GridLength>
+        <GridLength x:Key="Col.Size">48</GridLength>
+        <GridLength x:Key="Col.Scale">42</GridLength>
+        <GridLength x:Key="Col.Pk">32</GridLength>
+        <GridLength x:Key="Col.Null">46</GridLength>
+        <GridLength x:Key="Col.Description">1.5*</GridLength>
+
+        <!-- Divisor arrastável entre a lista de colunas e o detalhe -->
+        <Style x:Key="RowSplitter" TargetType="GridSplitter">
+            <Setter Property="Height" Value="7" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="ResizeDirection" Value="Rows" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="SizeNS" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GridSplitter">
+                        <Grid Background="Transparent">
+                            <Border x:Name="Line" Height="1" VerticalAlignment="Center" Background="{DynamicResource Brush.Border}" />
+                            <Border x:Name="Grip" Width="36" Height="4" CornerRadius="2" Background="{DynamicResource Brush.BorderStrong}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Grip" Property="Opacity" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="Grip" Property="Background" Value="{DynamicResource Brush.Accent}" />
+                                <Setter TargetName="Grip" Property="Opacity" Value="1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="40,34,40,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Pesquisar" Style="{StaticResource Text.PageTitle}" />
+            <TextBlock Text="Tabelas, colunas e códigos do catálogo carregado. Consulta offline: nada é executado no banco."
+                       Style="{StaticResource Text.PageSubtitle}" />
+        </StackPanel>
+
+        <!-- Campo de pesquisa -->
+        <TextBox x:Name="SearchBox" Grid.Row="1" Margin="0,22,0,0" Style="{StaticResource TextBox.Search}"
+                 Tag="Nome ou descrição: empregado, salario, nota fiscal…"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                 IsEnabled="{Binding HasCatalog}" AutomationProperties.Name="Pesquisar">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Escape" Command="{Binding ClearSearchCommand}" />
+            </TextBox.InputBindings>
+        </TextBox>
+
+        <!-- Filtros e total -->
+        <Grid Grid.Row="2" Margin="0,16,0,14" IsEnabled="{Binding HasCatalog}">
+            <StackPanel Orientation="Horizontal">
+                <Border Style="{StaticResource Segmented.Container}">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Content="Todos" Style="{StaticResource Segmented.Item}" GroupName="Scope"
+                                     IsChecked="{Binding Scope, Converter={StaticResource EnumToBoolean}, ConverterParameter=All}" />
+                        <RadioButton Content="Tabelas" Style="{StaticResource Segmented.Item}" GroupName="Scope"
+                                     IsChecked="{Binding Scope, Converter={StaticResource EnumToBoolean}, ConverterParameter=Tables}" />
+                        <RadioButton Content="Colunas" Style="{StaticResource Segmented.Item}" GroupName="Scope"
+                                     IsChecked="{Binding Scope, Converter={StaticResource EnumToBoolean}, ConverterParameter=Columns}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Segmented.Container}" Margin="12,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Content="Nome e descrição" Style="{StaticResource Segmented.Item}" GroupName="Field"
+                                     IsChecked="{Binding Field, Converter={StaticResource EnumToBoolean}, ConverterParameter=NameAndDescription}" />
+                        <RadioButton Content="Nome" Style="{StaticResource Segmented.Item}" GroupName="Field"
+                                     IsChecked="{Binding Field, Converter={StaticResource EnumToBoolean}, ConverterParameter=Name}" />
+                        <RadioButton Content="Descrição" Style="{StaticResource Segmented.Item}" GroupName="Field"
+                                     IsChecked="{Binding Field, Converter={StaticResource EnumToBoolean}, ConverterParameter=Description}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            <TextBlock Text="{Binding ResultSummary}" Style="{StaticResource Text.Secondary}" HorizontalAlignment="Right"
+                       VerticalAlignment="Center" FontWeight="SemiBold" />
+        </Grid>
+
+        <!-- Resultados + tabela aberta -->
+        <Grid Grid.Row="3" Visibility="{Binding HasCatalog, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" MinWidth="280" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="3.4*" MinWidth="440" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Resultados -->
+            <Border Style="{StaticResource Card}" Padding="6">
+                <DockPanel>
+                    <Border DockPanel.Dock="Bottom" Margin="8,6,8,4" Padding="12,8" CornerRadius="4"
+                            Background="{DynamicResource Brush.SurfaceAlt}"
+                            Visibility="{Binding IsResultTruncated, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="Refine a pesquisa para ver os demais resultados." Style="{StaticResource Text.Caption}" />
+                    </Border>
+                    <Grid>
+                        <ListBox ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}"
+                                 Style="{StaticResource List.Plain}" ItemContainerStyle="{StaticResource ListItem.Row}"
+                                 VirtualizingPanel.ScrollUnit="Pixel" AutomationProperties.Name="Resultados">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:SearchHitItem}">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border x:Name="Kind" Style="{StaticResource KindPill}">
+                                                <TextBlock Text="{Binding KindText}" />
+                                            </Border>
+                                            <TextBlock Grid.Column="1" Text="{Binding FullName}" Margin="8,0,0,0" FontWeight="SemiBold" FontSize="13.5"
+                                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip="{Binding FullName}" />
+                                        </Grid>
+                                        <TextBlock x:Name="Description" Text="{Binding DescriptionText}" Style="{StaticResource Text.Caption}"
+                                                   Margin="0,4,0,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsColumn}" Value="True">
+                                            <Setter TargetName="Kind" Property="Style" Value="{StaticResource KindPill.Column}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HasDescription}" Value="False">
+                                            <Setter TargetName="Description" Property="FontStyle" Value="Italic" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- Nenhum resultado -->
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20"
+                                    Visibility="{Binding Results.Count, Converter={StaticResource EmptyToVisible}}">
+                            <TextBlock Text="&#xE721;" Style="{StaticResource Text.Icon}" FontSize="28" HorizontalAlignment="Center"
+                                       Foreground="{DynamicResource Brush.BorderStrong}" />
+                            <TextBlock Text="Nenhum resultado" Style="{StaticResource Text.CardTitle}" Margin="0,8,0,0" HorizontalAlignment="Center" />
+                            <TextBlock Text="Tente outra palavra, ou pesquise em nome e descrição." Style="{StaticResource Text.Caption}"
+                                       HorizontalAlignment="Center" TextAlignment="Center" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </DockPanel>
+            </Border>
+
+            <!-- Tabela aberta -->
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="0">
+                <Grid>
+                    <!-- Nenhuma tabela aberta -->
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="28"
+                                Visibility="{Binding HasTable, Converter={StaticResource InverseBoolToVisibility}}">
+                        <Grid Width="56" Height="56">
+                            <Ellipse Fill="{DynamicResource Brush.AccentSubtle}" />
+                            <TextBlock Text="&#xEE94;" Style="{StaticResource Text.Icon}" FontSize="24" HorizontalAlignment="Center"
+                                       Foreground="{DynamicResource Brush.Accent}" />
+                        </Grid>
+                        <TextBlock Text="Selecione um resultado" Style="{StaticResource Text.SectionTitle}" Margin="0,14,0,0" HorizontalAlignment="Center" />
+                        <TextBlock Text="A tabela aparece aqui com as colunas, os códigos documentados e o SELECT."
+                                   Style="{StaticResource Text.Caption}" FontSize="13" Margin="0,4,0,0" HorizontalAlignment="Center"
+                                   TextAlignment="Center" MaxWidth="320" />
+                    </StackPanel>
+
+                    <Grid Visibility="{Binding HasTable, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="3*" MinHeight="100" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="2*" MinHeight="170" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Cabeçalho da tabela -->
+                        <Grid Margin="22,18,14,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding TableTitle}" Style="{StaticResource Text.SectionTitle}" FontSize="18"
+                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                    <Border Style="{StaticResource KindPill}" Margin="10,0,0,0">
+                                        <TextBlock Text="{Binding TableTypeText}" />
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Text="{Binding TableDescription}" Style="{StaticResource Text.Secondary}" Margin="0,4,0,0" />
+                                <TextBlock Text="{Binding SelectionText}" Style="{StaticResource Text.Caption}" Margin="0,2,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                                <Button Style="{StaticResource Button.Ghost}" Command="{Binding CopyTableNameCommand}" FontSize="13"
+                                        ToolTip="Copiar o nome completo da tabela">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE8C8;" Style="{StaticResource Text.Icon}" FontSize="14" />
+                                        <TextBlock Text="Copiar nome" Margin="8,0,0,0" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource Button.Secondary}" Command="{Binding ExportContextCommand}" FontSize="13"
+                                        Padding="12,7" Margin="6,0,0,0"
+                                        ToolTip="Salva um Markdown com colunas, descrições e códigos desta tabela, para acompanhar um pedido de revisão de SQL. Nada é enviado à internet.">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE74E;" Style="{StaticResource Text.Icon}" FontSize="14" />
+                                        <TextBlock Text="Exportar para IA…" Margin="8,0,0,0" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Cabeçalho das colunas -->
+                        <Border Grid.Row="1" Background="{DynamicResource Brush.SurfaceAlt}" BorderBrush="{DynamicResource Brush.Border}"
+                                BorderThickness="0,1" Padding="22,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{StaticResource Col.Name}" />
+                                    <ColumnDefinition Width="{StaticResource Col.Type}" />
+                                    <ColumnDefinition Width="{StaticResource Col.Size}" />
+                                    <ColumnDefinition Width="{StaticResource Col.Scale}" />
+                                    <ColumnDefinition Width="{StaticResource Col.Pk}" />
+                                    <ColumnDefinition Width="{StaticResource Col.Null}" />
+                                    <ColumnDefinition Width="{StaticResource Col.Description}" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="COLUNA" Style="{StaticResource HeaderCell}" />
+                                <TextBlock Grid.Column="1" Text="TIPO" Style="{StaticResource HeaderCell}" />
+                                <TextBlock Grid.Column="2" Text="TAM." Style="{StaticResource HeaderCell}" ToolTip="Tamanho ou precisão" />
+                                <TextBlock Grid.Column="3" Text="ESC." Style="{StaticResource HeaderCell}" ToolTip="Escala" />
+                                <TextBlock Grid.Column="4" Text="PK" Style="{StaticResource HeaderCell}" ToolTip="Chave primária" />
+                                <TextBlock Grid.Column="5" Text="NULO" Style="{StaticResource HeaderCell}" ToolTip="Aceita nulo" />
+                                <TextBlock Grid.Column="6" Text="DESCRIÇÃO" Style="{StaticResource HeaderCell}" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Colunas -->
+                        <ListBox Grid.Row="2" ItemsSource="{Binding Columns}" SelectionMode="Extended"
+                                 Style="{StaticResource List.Plain}" ItemContainerStyle="{StaticResource ColumnRow}"
+                                 VirtualizingPanel.IsVirtualizing="False"
+                                 behaviors:ScrollToSelection.IsEnabled="True"
+                                 AutomationProperties.Name="Colunas da tabela">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:ColumnItem}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="{StaticResource Col.Name}" />
+                                            <ColumnDefinition Width="{StaticResource Col.Type}" />
+                                            <ColumnDefinition Width="{StaticResource Col.Size}" />
+                                            <ColumnDefinition Width="{StaticResource Col.Scale}" />
+                                            <ColumnDefinition Width="{StaticResource Col.Pk}" />
+                                            <ColumnDefinition Width="{StaticResource Col.Null}" />
+                                            <ColumnDefinition Width="{StaticResource Col.Description}" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}" Style="{StaticResource Cell}" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}" ToolTip="{Binding Name}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Type}" Style="{StaticResource Cell}" />
+                                        <TextBlock Grid.Column="2" Text="{Binding SizeText}" Style="{StaticResource Cell}" />
+                                        <TextBlock Grid.Column="3" Text="{Binding ScaleText}" Style="{StaticResource Cell}" />
+                                        <TextBlock Grid.Column="4" Text="&#xE8D7;" Style="{StaticResource Text.Icon}" FontSize="13"
+                                                   Foreground="{DynamicResource Brush.Accent}" HorizontalAlignment="Left" ToolTip="Chave primária"
+                                                   Visibility="{Binding IsPrimaryKey, Converter={StaticResource BoolToVisibility}}" />
+                                        <TextBlock Grid.Column="5" Text="{Binding NullText}" Style="{StaticResource Cell}" />
+                                        <Grid Grid.Column="6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Description}" Style="{StaticResource Cell}" ToolTip="{Binding Description}" />
+                                            <Border Grid.Column="1" Style="{StaticResource Pill}" Padding="7,0" Background="{DynamicResource Brush.SurfaceHover}"
+                                                    Visibility="{Binding HasCodes, Converter={StaticResource BoolToVisibility}}">
+                                                <TextBlock Text="{Binding CodesText}" FontSize="11" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Brush.Text.Secondary}" />
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <GridSplitter Grid.Row="3" Style="{StaticResource RowSplitter}" ToolTip="Arraste para ajustar o espaço da lista e do detalhe" />
+
+                        <!-- Detalhe da coluna e SELECT -->
+                        <Border Grid.Row="4" Padding="22,8,22,16">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid>
+                                    <Border Style="{StaticResource Segmented.Container}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton Content="Campo e códigos" Style="{StaticResource Segmented.Item}" GroupName="DetailTab"
+                                                         IsChecked="{Binding DetailTab, Converter={StaticResource EnumToBoolean}, ConverterParameter=Column}" />
+                                            <RadioButton Content="SELECT" Style="{StaticResource Segmented.Item}" GroupName="DetailTab"
+                                                         IsChecked="{Binding DetailTab, Converter={StaticResource EnumToBoolean}, ConverterParameter=Select}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Button Content="Todas" Style="{StaticResource Button.Ghost}" FontSize="13" Padding="10,6"
+                                                Command="{Binding SelectAllColumnsCommand}" ToolTip="Selecionar todas as colunas" />
+                                        <Button Content="Limpar" Style="{StaticResource Button.Ghost}" FontSize="13" Padding="10,6"
+                                                Command="{Binding ClearColumnSelectionCommand}" ToolTip="Limpar a seleção de colunas" />
+                                        <Button Style="{StaticResource Button.Primary}" Padding="14,7" FontSize="13" Margin="8,0,0,0"
+                                                Command="{Binding CopySelectCommand}"
+                                                ToolTip="O SELECT é apenas texto: o B.T não executa consultas. Defina filtros de empresa/período e junções no relatório.">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xE8C8;" Style="{StaticResource Text.Icon}" FontSize="14" />
+                                                <TextBlock Text="Copiar SELECT" Margin="8,0,0,0" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Campo e códigos -->
+                                <Grid Grid.Row="1" Margin="0,12,0,0"
+                                      Visibility="{Binding DetailTab, Converter={StaticResource EnumToVisibility}, ConverterParameter=Column}">
+                                    <TextBlock Text="Selecione uma coluna para consultar a descrição, o valor padrão e os códigos documentados."
+                                               Style="{StaticResource Text.Caption}" FontSize="13" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                               Visibility="{Binding HasDetailColumn, Converter={StaticResource InverseBoolToVisibility}}" />
+                                    <Grid DataContext="{Binding DetailColumn}"
+                                          Visibility="{Binding DataContext.HasDetailColumn, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="1.15*" />
+                                        </Grid.ColumnDefinitions>
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}" FontFamily="{DynamicResource Font.Mono}" FontSize="14" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource Brush.Text.Primary}" VerticalAlignment="Center" />
+                                                    <Button Style="{StaticResource Button.Ghost}" Width="28" Height="28" Padding="0" Margin="6,0,0,0"
+                                                            Command="{Binding DataContext.CopyColumnNameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            ToolTip="Copiar o nome da coluna">
+                                                        <TextBlock Text="&#xE8C8;" Style="{StaticResource Text.Icon}" FontSize="13" />
+                                                    </Button>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding DescriptionText}" Style="{StaticResource Text.Body}" Margin="0,6,0,0" />
+                                                <Grid Margin="0,12,0,0" TextElement.FontSize="13">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <TextBlock Text="Tipo" Style="{StaticResource Text.Caption}" Margin="0,0,14,4" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding TypeText}" FontFamily="{DynamicResource Font.Mono}" FontSize="12.5"
+                                                               Foreground="{DynamicResource Brush.Text.Primary}" />
+                                                    <TextBlock Grid.Row="1" Text="Valor padrão" Style="{StaticResource Text.Caption}" Margin="0,0,14,0" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DefaultValueText}" FontFamily="{DynamicResource Font.Mono}"
+                                                               FontSize="12.5" Foreground="{DynamicResource Brush.Text.Primary}" TextWrapping="Wrap" />
+                                                </Grid>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <!-- Códigos documentados -->
+                                        <Border Grid.Column="2" Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="6"
+                                                BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1">
+                                            <DockPanel>
+                                                <TextBlock DockPanel.Dock="Top" Text="CÓDIGOS DOCUMENTADOS" Style="{StaticResource Text.Overline}" Margin="14,10,14,6" />
+                                                <TextBlock Text="Nenhum código neste catálogo. Isso não significa ausência de regras no sistema."
+                                                           Style="{StaticResource Text.Caption}" Margin="14,0,14,10"
+                                                           Visibility="{Binding HasCodes, Converter={StaticResource InverseBoolToVisibility}}" />
+                                                <ItemsControl ItemsSource="{Binding Column.Codes}" Margin="0,0,0,6" Focusable="False"
+                                                              Visibility="{Binding HasCodes, Converter={StaticResource BoolToVisibility}}">
+                                                    <ItemsControl.Template>
+                                                        <ControlTemplate TargetType="ItemsControl">
+                                                            <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+                                                                <ItemsPresenter />
+                                                            </ScrollViewer>
+                                                        </ControlTemplate>
+                                                    </ItemsControl.Template>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Margin="14,3">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="56" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock Text="{Binding Value}" FontFamily="{DynamicResource Font.Mono}" FontSize="12.5"
+                                                                           FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text.Primary}"
+                                                                           TextTrimming="CharacterEllipsis" ToolTip="{Binding Value}" />
+                                                                <TextBlock Grid.Column="1" Text="{Binding Description}" FontSize="13" TextWrapping="Wrap"
+                                                                           Foreground="{DynamicResource Brush.Text.Secondary}" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </DockPanel>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+
+                                <!-- SELECT -->
+                                <Grid Grid.Row="1" Margin="0,12,0,0"
+                                      Visibility="{Binding DetailTab, Converter={StaticResource EnumToVisibility}, ConverterParameter=Select}">
+                                    <TextBox Text="{Binding SelectSql, Mode=OneWay}" IsReadOnly="True" FontFamily="{DynamicResource Font.Mono}" FontSize="13"
+                                             VerticalContentAlignment="Top" TextWrapping="NoWrap" AcceptsReturn="True"
+                                             HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                                             Tag="Selecione uma ou mais colunas da tabela (Ctrl/Shift + clique para várias)."
+                                             AutomationProperties.Name="SELECT gerado" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Sem catálogo -->
+        <Border Grid.Row="3" Style="{StaticResource Card}" VerticalAlignment="Top" Padding="28,32"
+                Visibility="{Binding HasCatalog, Converter={StaticResource InverseBoolToVisibility}}">
+            <StackPanel HorizontalAlignment="Center">
+                <Grid Width="56" Height="56">
+                    <Ellipse Fill="{DynamicResource Brush.WarningSubtle}" />
+                    <TextBlock Text="&#xEE94;" Style="{StaticResource Text.Icon}" FontSize="24" HorizontalAlignment="Center"
+                               Foreground="{DynamicResource Brush.Warning}" />
+                </Grid>
+                <TextBlock Text="Nenhum catálogo carregado" Style="{StaticResource Text.SectionTitle}" FontSize="18" Margin="0,14,0,0"
+                           HorizontalAlignment="Center" />
+                <TextBlock Style="{StaticResource Text.Secondary}" Margin="0,6,0,0" HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="460"
+                           Text="Exporte o catálogo do banco em Atualizar catálogo, ou abra um catalogo.json já exportado." />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,18,0,0">
+                    <Button Content="Atualizar catálogo" Style="{StaticResource Button.Primary}" Command="{Binding OpenCollectorCommand}" />
+                    <Button Content="Abrir arquivo…" Style="{StaticResource Button.Secondary}" Margin="10,0,0,0" Command="{Binding OpenCatalogCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Mensagem de confirmação (some sozinha) -->
+        <Border Grid.Row="4" Style="{StaticResource Pill}" Margin="0,14,0,0" Padding="12,6" Background="{DynamicResource Brush.SuccessSubtle}"
+                Visibility="{Binding StatusMessage, Converter={StaticResource EmptyToCollapsed}}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE73E;" Style="{StaticResource Text.Icon}" FontSize="13" Foreground="{DynamicResource Brush.Success}" />
+                <TextBlock Text="{Binding StatusMessage}" Margin="8,0,0,0" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Success}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

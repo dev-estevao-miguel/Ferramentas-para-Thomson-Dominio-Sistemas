@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 48 48">
+  <title>Banco Pronto - símbolo Camadas (TSCBr)</title>
+  <rect width="48" height="48" rx="10.56" fill="#D64000"/>
+  <g transform="translate(8.16 8.16) scale(0.66)">
+    <path d="M9 31.5a15 5 0 0 1 30 0v5a15 5 0 0 1-30 0z" fill="#FFFFFF" stroke="#D64000" stroke-width="2.2"/>
+    <path d="M9 21.5a15 5 0 0 1 30 0v5a15 5 0 0 1-30 0z" fill="#FFFFFF" stroke="#D64000" stroke-width="2.2"/>
+    <path d="M9 11.5a15 5 0 0 1 30 0v5a15 5 0 0 1-30 0z" fill="#1C1B1A" stroke="#D64000" stroke-width="2.2"/>
+    <path d="M9 11.5a15 5 0 0 0 30 0" fill="none" stroke="#D64000" stroke-width="2"/>
+  </g>
+</svg>

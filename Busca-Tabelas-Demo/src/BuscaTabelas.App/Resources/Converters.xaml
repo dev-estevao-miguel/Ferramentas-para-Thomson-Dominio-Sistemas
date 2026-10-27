@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:BuscaTabelas.App.Converters">
+
+    <converters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <converters:BoolToVisibilityConverter x:Key="InverseBoolToVisibility" Invert="True" />
+    <converters:EmptyToVisibilityConverter x:Key="EmptyToCollapsed" />
+    <converters:EmptyToVisibilityConverter x:Key="EmptyToVisible" Invert="True" />
+    <converters:EnumToVisibilityConverter x:Key="EnumToVisibility" />
+    <converters:EnumToBooleanConverter x:Key="EnumToBoolean" />
+</ResourceDictionary>

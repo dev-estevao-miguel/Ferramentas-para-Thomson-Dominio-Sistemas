@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>BuscaTabelas.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Coletor ODBC: uma única fonte em tools/coletor, usada pelos atalhos .cmd e pelo aplicativo. -->
+    <EmbeddedResource Include="..\..\tools\coletor\BT.ps1" LogicalName="BuscaTabelas.Coletor.BT.ps1" Link="Collector\Coletor\BT.ps1" />
+    <EmbeddedResource Include="..\..\tools\coletor\sql\*.sql" LogicalName="BuscaTabelas.Coletor.sql.%(Filename)%(Extension)" Link="Collector\Coletor\sql\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

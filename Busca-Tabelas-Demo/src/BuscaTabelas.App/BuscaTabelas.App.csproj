@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>BuscaTabelas.App</RootNamespace>
+    <AssemblyName>BuscaTabelas</AssemblyName>
+    <!-- Nome exibido no Gerenciador de Tarefas e nas propriedades do arquivo -->
+    <AssemblyTitle>Busca Tabelas Demo</AssemblyTitle>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Resources\Branding\app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Ícone (ver Resources/Branding/README.md) -->
+    <Resource Include="Resources\Branding\*.ico" />
+    <!-- Source Sans 3 (SIL Open Font License, ver Resources/Fonts/LICENSE-SourceSans3.md) -->
+    <Resource Include="Resources\Fonts\*.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Catálogo fictício aberto na primeira execução (modo demonstração). -->
+    <Content Include="..\..\samples\catalogo-demo.json" Link="samples\catalogo-demo.json"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BuscaTabelas.Core\BuscaTabelas.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,19 @@
+<UserControl x:Class="BuscaTabelas.App.Views.Controls.BrandLogo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="34" Height="34" IsHitTestVisible="False">
+    <!-- Símbolo do B.T em vetor (viewBox 48): tabela com cabeçalho escuro e lupa, sobre o laranja da família BancoPronto.
+         Mesmo desenho de docs/marca/icone.svg e do app.ico (tools/Gerar-Icone.ps1). -->
+    <Viewbox Stretch="Uniform">
+        <Canvas Width="48" Height="48">
+            <Rectangle Width="48" Height="48" RadiusX="10.56" RadiusY="10.56" Fill="{DynamicResource Brush.Accent}" />
+            <!-- Tabela -->
+            <Rectangle Canvas.Left="8" Canvas.Top="10" Width="27" Height="23" RadiusX="2.5" RadiusY="2.5" Fill="White" />
+            <Path Data="M8,12.5 A2.5,2.5 0 0 1 10.5,10 H32.5 A2.5,2.5 0 0 1 35,12.5 V16.5 H8 Z" Fill="#1C1B1A" />
+            <Path Data="M8,22.25 H35 M8,27.75 H35 M17,16.5 V33" Stroke="{DynamicResource Brush.Accent}" StrokeThickness="1.4" Opacity="0.55" />
+            <!-- Lupa -->
+            <Ellipse Canvas.Left="24.5" Canvas.Top="22.5" Width="15" Height="15" Fill="{DynamicResource Brush.Accent}" Stroke="White" StrokeThickness="3" />
+            <Path Data="M37.3,35.3 L41.5,39.5" Stroke="White" StrokeThickness="3.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+        </Canvas>
+    </Viewbox>
+</UserControl>

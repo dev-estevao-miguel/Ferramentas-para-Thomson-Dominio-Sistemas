@@ -1,0 +1,376 @@
+<UserControl x:Class="BuscaTabelas.App.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:BuscaTabelas.App.ViewModels"
+             xmlns:controls="clr-namespace:BuscaTabelas.App.Views.Controls"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:AboutViewModel}"
+             d:DesignWidth="1048" d:DesignHeight="1400">
+
+    <UserControl.Resources>
+        <!-- Texto corrido: line-height 1.6 -->
+        <Style x:Key="About.Paragraph" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+            <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+        </Style>
+
+        <!-- Ícone quadrado com fundo laranja suave (benefícios) -->
+        <Style x:Key="About.IconTile" TargetType="Border">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Background" Value="{DynamicResource Brush.AccentSubtle}" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="About.IconTileGlyph" TargetType="TextBlock" BasedOn="{StaticResource Text.Icon}">
+            <Setter Property="FontSize" Value="21" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+
+        <!-- Cards da página -->
+        <Style x:Key="About.Card" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Padding" Value="24,22" />
+        </Style>
+        <Style x:Key="About.CardTitle" TargetType="TextBlock" BasedOn="{StaticResource Text.SectionTitle}">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+
+        <!-- Célula "Informações do aplicativo" -->
+        <Style x:Key="About.InfoCell" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Brush.SurfaceAlt}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="14,12" />
+        </Style>
+        <Style x:Key="About.InfoValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+
+        <!-- Botões discretos com borda (GitHub, LinkedIn) -->
+        <Style x:Key="About.OutlineButton" TargetType="Button" BasedOn="{StaticResource Button.Secondary}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border}" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="Padding" Value="16,6" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <!-- Copiar diagnóstico: fica verde por 2,2 s depois de copiar -->
+        <Style x:Key="About.CopyButton" TargetType="Button" BasedOn="{StaticResource Button.Secondary}">
+            <Setter Property="Padding" Value="15,8" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDiagnosticsCopied}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Brush.SuccessSubtle}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.SuccessSubtle}" />
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Success}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Links do rodapé: cinza, laranja ao passar o mouse -->
+        <Style x:Key="About.FooterLink" TargetType="Button">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tertiary}" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="18,0,0,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="40,34,40,24" MaxWidth="1120">
+            <TextBlock Text="Sobre" Style="{StaticResource Text.PageTitle}" />
+
+            <!-- ================= Card principal ================= -->
+            <Border Style="{StaticResource Card}" Margin="0,24,0,0" Padding="36,32">
+                <controls:AdaptiveWrapPanel Spacing="40" RowSpacing="32">
+                    <!-- Produto -->
+                    <DockPanel controls:AdaptiveWrapPanel.Weight="2" MinWidth="420">
+                        <WrapPanel DockPanel.Dock="Bottom" Margin="0,26,0,0">
+                            <Button Style="{StaticResource Button.Secondary}" Padding="15,8" Command="{Binding OpenReleaseNotesCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8A5;" Style="{StaticResource Text.Icon}" FontSize="16" Foreground="{DynamicResource Brush.Text.Secondary}" />
+                                    <TextBlock Text="Notas da versão" Margin="8,0,0,0" />
+                                </StackPanel>
+                            </Button>
+                        </WrapPanel>
+
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <controls:BrandLogo Width="56" Height="56" />
+                                <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding AppName}" FontFamily="{DynamicResource Font.Display}" FontSize="30" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Brush.Text.Primary}" />
+                                    <TextBlock Text="Catálogo de metadados, sem conexão" FontSize="16" Margin="0,2,0,0"
+                                               Foreground="{DynamicResource Brush.Text.Secondary}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <TextBlock Margin="0,24,0,0" MaxWidth="600" HorizontalAlignment="Left" FontSize="18" LineHeight="26"
+                                       Foreground="{DynamicResource Brush.Text.Primary}" TextWrapping="Wrap"
+                                       Text="Encontre em segundos a tabela e a coluna certas para relatórios, análises e atendimentos." />
+                            <TextBlock Style="{StaticResource About.Paragraph}" Margin="0,10,0,0" MaxWidth="620" HorizontalAlignment="Left"
+                                       FontSize="14.5" LineHeight="23.2"
+                                       Text="O B.T pesquisa o catálogo de um banco SQL Anywhere (tabelas, colunas, descrições e códigos documentados) sem conexão, monta o SELECT das colunas escolhidas e gera o contexto de uma tabela para revisão com IA." />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <!-- Fluxo automatizado -->
+                    <Border controls:AdaptiveWrapPanel.Weight="1" MinWidth="260" Background="{DynamicResource Brush.SurfaceAlt}"
+                            BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" CornerRadius="6" Padding="22,20">
+                        <StackPanel>
+                            <TextBlock Text="DO BANCO À CONSULTA" Style="{StaticResource Text.Overline}" />
+                            <Grid Margin="0,12,0,0">
+                                <!-- Linha vertical que liga as bolinhas (centro da primeira até o da última) -->
+                                <Rectangle Width="1.5" HorizontalAlignment="Left" Margin="7.25,13.5,0,13.5"
+                                           Fill="{DynamicResource Brush.Border}" />
+                                <StackPanel>
+                                    <ItemsControl ItemsSource="{Binding FlowSteps}" Focusable="False">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid MinHeight="27">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="16" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Ellipse Width="9" Height="9" StrokeThickness="1.5"
+                                                             Stroke="{DynamicResource Brush.BorderStrong}" Fill="{DynamicResource Brush.SurfaceAlt}" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding}" Margin="12,0,0,0" FontSize="13.5" VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource Brush.Text.Secondary}" TextWrapping="Wrap" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <Grid MinHeight="27">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Width="16" Height="16">
+                                            <Ellipse Fill="{DynamicResource Brush.Success}" />
+                                            <TextBlock Text="&#xE73E;" Style="{StaticResource Text.Icon}" FontSize="10" FontWeight="Bold"
+                                                       Foreground="{DynamicResource Brush.SurfaceAlt}" HorizontalAlignment="Center" />
+                                        </Grid>
+                                        <TextBlock Grid.Column="1" Text="Consulta pronta para uso" Margin="12,0,0,0" FontSize="13.5" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.Primary}" TextWrapping="Wrap" />
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </controls:AdaptiveWrapPanel>
+            </Border>
+
+            <!-- ================= Sobre o Busca Tabelas ================= -->
+            <TextBlock Text="Sobre o Busca Tabelas" Style="{StaticResource Text.SectionTitle}" FontSize="18" Margin="0,36,0,0" />
+            <StackPanel MaxWidth="720" HorizontalAlignment="Left" Margin="0,10,0,0">
+                <TextBlock Style="{StaticResource About.Paragraph}" FontSize="15" LineHeight="24"
+                           Text="O Busca Tabelas (B.T) nasceu para substituir um utilitário legado de consulta ao catálogo que deixou de funcionar nas versões atuais do Java." />
+                <TextBlock Style="{StaticResource About.Paragraph}" FontSize="15" LineHeight="24" Margin="0,10,0,0"
+                           Text="O catálogo é exportado uma vez e consultado localmente: a pesquisa é imediata, não depende do banco estar no ar e não lê nenhum registro de clientes." />
+            </StackPanel>
+
+            <!-- Benefícios -->
+            <controls:AdaptiveWrapPanel Margin="0,20,0,0" Spacing="16" RowSpacing="16">
+                <Border Style="{StaticResource Card}" Padding="22,20" MinWidth="240">
+                    <StackPanel>
+                        <Border Style="{StaticResource About.IconTile}">
+                            <TextBlock Text="&#xE721;" Style="{StaticResource About.IconTileGlyph}" />
+                        </Border>
+                        <TextBlock Text="Pesquisa rápida" Style="{StaticResource Text.CardTitle}" Margin="0,14,0,0" />
+                        <TextBlock Style="{StaticResource About.Paragraph}" LineHeight="21" Margin="0,4,0,0"
+                                   Text="Nome e descrição, sem acentos nem maiúsculas, com os resultados mais prováveis primeiro." />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Padding="22,20" MinWidth="240">
+                    <StackPanel>
+                        <Border Style="{StaticResource About.IconTile}">
+                            <TextBlock Text="&#xEE94;" Style="{StaticResource About.IconTileGlyph}" />
+                        </Border>
+                        <TextBlock Text="Dicionário completo" Style="{StaticResource Text.CardTitle}" Margin="0,14,0,0" />
+                        <TextBlock Style="{StaticResource About.Paragraph}" LineHeight="21" Margin="0,4,0,0"
+                                   Text="Tipos, chave primária, valores padrão e os códigos documentados de cada coluna." />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Padding="22,20" MinWidth="240">
+                    <StackPanel>
+                        <Border Style="{StaticResource About.IconTile}">
+                            <TextBlock Text="&#xEA18;" Style="{StaticResource About.IconTileGlyph}" />
+                        </Border>
+                        <TextBlock Text="Segurança" Style="{StaticResource Text.CardTitle}" Margin="0,14,0,0" />
+                        <TextBlock Style="{StaticResource About.Paragraph}" LineHeight="21" Margin="0,4,0,0"
+                                   Text="Somente metadados. A senha fica no terminal do coletor e nada é enviado à internet." />
+                    </StackPanel>
+                </Border>
+            </controls:AdaptiveWrapPanel>
+
+            <!-- ================= Informações e compatibilidade ================= -->
+            <controls:AdaptiveWrapPanel Margin="0,28,0,0" Spacing="16" RowSpacing="16">
+                <Border Style="{StaticResource About.Card}" MinWidth="380">
+                    <StackPanel>
+                        <TextBlock Text="Informações do aplicativo" Style="{StaticResource About.CardTitle}" />
+                        <Grid Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Border Style="{StaticResource About.InfoCell}">
+                                <StackPanel>
+                                    <TextBlock Text="Versão" Style="{StaticResource Text.Caption}" />
+                                    <TextBlock Text="{Binding Version}" Style="{StaticResource About.InfoValue}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Style="{StaticResource About.InfoCell}">
+                                <StackPanel>
+                                    <TextBlock Text="Plataforma" Style="{StaticResource Text.Caption}" />
+                                    <TextBlock Text="{Binding Platform}" Style="{StaticResource About.InfoValue}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="2" Style="{StaticResource About.InfoCell}">
+                                <StackPanel>
+                                    <TextBlock Text="Runtime" Style="{StaticResource Text.Caption}" />
+                                    <TextBlock Text="{Binding Runtime}" Style="{StaticResource About.InfoValue}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource About.InfoCell}">
+                                <StackPanel>
+                                    <TextBlock Text="Canal" Style="{StaticResource Text.Caption}" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                        <Ellipse Width="7" Height="7" Fill="{DynamicResource Brush.Success}" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Channel}" Style="{StaticResource About.InfoValue}" Margin="7,0,0,0" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource About.Card}" MinWidth="380">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="Compatibilidade" Style="{StaticResource About.CardTitle}" />
+                        <Border DockPanel.Dock="Top" Margin="0,16,0,0" Padding="16,13" CornerRadius="6" BorderThickness="1"
+                                Background="{DynamicResource Brush.SurfaceAlt}" BorderBrush="{DynamicResource Brush.Border}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE930;" Style="{StaticResource Text.Icon}" FontSize="22" Foreground="{DynamicResource Brush.Success}" />
+                                <TextBlock Grid.Column="1" Text="Compatível com o catálogo de sistema do SQL Anywhere" Margin="12,0,0,0"
+                                           FontSize="15.5" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text.Primary}"
+                                           TextWrapping="Wrap" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource About.Paragraph}" LineHeight="21.7" Margin="0,12,0,0"
+                                   Text="Versão pública de demonstração, com catálogo fictício. Baseada em uma ferramenta real desenvolvida para apoiar a análise e o desenvolvimento de relatórios no ecossistema Thomson Reuters | Domínio Sistemas." />
+                        <TextBlock Style="{StaticResource Text.Caption}" FontSize="12" Opacity="0.8" Margin="0,14,0,0" VerticalAlignment="Bottom" TextWrapping="Wrap"
+                                   Text="Thomson Reuters, Domínio Sistemas, SQL Anywhere e demais marcas mencionadas pertencem aos seus respectivos proprietários. Este projeto não é um produto oficial da Thomson Reuters." />
+                    </DockPanel>
+                </Border>
+            </controls:AdaptiveWrapPanel>
+
+            <!-- ================= Desenvolvimento e ajuda ================= -->
+            <controls:AdaptiveWrapPanel Margin="0,16,0,0" Spacing="16" RowSpacing="16">
+                <Border Style="{StaticResource About.Card}" MinWidth="380">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="Desenvolvimento" Style="{StaticResource About.CardTitle}" />
+                        <Grid DockPanel.Dock="Top" Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <!-- Iniciais do desenvolvedor em círculo (a versão pública não inclui foto). -->
+                            <Border Width="80" Height="80" CornerRadius="40" VerticalAlignment="Center" Background="{DynamicResource Brush.Accent}">
+                                <TextBlock Text="EM" FontSize="26" FontWeight="SemiBold" Foreground="White"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Sistema desenvolvido por" Style="{StaticResource Text.Caption}" />
+                                <TextBlock Text="Estevão Miguel dos Santos" FontSize="17" FontWeight="SemiBold" Margin="0,1,0,0"
+                                           Foreground="{DynamicResource Brush.Text.Primary}" TextWrapping="Wrap" />
+                                <TextBlock Text="Lead developer" FontSize="13.5" Margin="0,2,0,0"
+                                           Foreground="{DynamicResource Brush.Accent}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource About.Paragraph}" LineHeight="21" Margin="0,14,0,0"
+                                   Text="Projeto, arquitetura, desenvolvimento e manutenção do B.T e do B.P." />
+                        <WrapPanel Margin="0,18,0,0" VerticalAlignment="Bottom">
+                            <Button Content="GitHub" Style="{StaticResource About.OutlineButton}" Command="{Binding OpenGitHubCommand}" />
+                            <Button Content="LinkedIn" Style="{StaticResource About.OutlineButton}" Command="{Binding OpenLinkedInCommand}" />
+                        </WrapPanel>
+                    </DockPanel>
+                </Border>
+
+                <Border Style="{StaticResource About.Card}" MinWidth="380">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="Precisa de ajuda?" Style="{StaticResource About.CardTitle}" />
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource About.Paragraph}" LineHeight="21" Margin="0,8,0,0"
+                                   MaxWidth="460" HorizontalAlignment="Left"
+                                   Text="Em caso de erro ou comportamento inesperado, copie as informações de diagnóstico e abra uma issue no repositório do projeto." />
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource Text.Caption}" Margin="0,8,0,0"
+                                   Text="Inclui versão do B.T, Windows, .NET, catálogo carregado e data/hora." />
+                        <WrapPanel Margin="0,18,0,0" VerticalAlignment="Bottom">
+                            <Button Style="{StaticResource About.CopyButton}" Command="{Binding CopyDiagnosticsCommand}"
+                                    AutomationProperties.Name="Copiar informações de diagnóstico">
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal"
+                                                Visibility="{Binding IsDiagnosticsCopied, Converter={StaticResource InverseBoolToVisibility}}">
+                                        <TextBlock Text="&#xE8C8;" Style="{StaticResource Text.Icon}" FontSize="16" Foreground="{DynamicResource Brush.Accent}" />
+                                        <TextBlock Text="Copiar informações de diagnóstico" Margin="8,0,0,0" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal"
+                                                Visibility="{Binding IsDiagnosticsCopied, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="&#xE73E;" Style="{StaticResource Text.Icon}" FontSize="16" />
+                                        <TextBlock Text="Informações copiadas" Margin="8,0,0,0" />
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                            <Button Style="{StaticResource Button.Ghost}" Padding="12,9" Command="{Binding OpenLogsCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8A5;" Style="{StaticResource Text.Icon}" FontSize="16" />
+                                    <TextBlock Text="Abrir logs" Margin="8,0,0,0" />
+                                </StackPanel>
+                            </Button>
+                        </WrapPanel>
+                    </DockPanel>
+                </Border>
+            </controls:AdaptiveWrapPanel>
+
+            <!-- ================= Rodapé ================= -->
+            <Border Margin="0,32,0,0" Padding="0,16,0,0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource Brush.Border}">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Licença" Style="{StaticResource About.FooterLink}" Command="{Binding OpenLicenseCommand}" />
+                        <Button Content="Privacidade" Style="{StaticResource About.FooterLink}" Command="{Binding OpenPrivacyCommand}" />
+                    </StackPanel>
+                    <TextBlock Text="B.T · Busca Tabelas Demo © 2026 TSCBr" Style="{StaticResource Text.Caption}"
+                               VerticalAlignment="Center" />
+                </DockPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

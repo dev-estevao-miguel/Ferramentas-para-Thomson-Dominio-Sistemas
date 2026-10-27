@@ -1,0 +1,26 @@
+# Regras gerais; cada ferramenta tem também o próprio .gitignore.
+bin/
+obj/
+publish/
+TestResults/
+.vs/
+.idea/
+*.user
+*.suo
+
+.env
+.env.*
+!.env.example
+
+*.log
+*.db
+*.dom
+*.bak
+*.dump
+*.zip
+
+.DS_Store
+Thumbs.db
+
+*_Original*
+_BACKUP_ORIGINAIS/

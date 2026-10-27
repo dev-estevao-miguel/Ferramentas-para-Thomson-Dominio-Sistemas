@@ -1,0 +1,230 @@
+<UserControl x:Class="BuscaTabelas.App.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:BuscaTabelas.App.ViewModels"
+             xmlns:controls="clr-namespace:BuscaTabelas.App.Views.Controls"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:HomeViewModel}"
+             d:DesignWidth="1048" d:DesignHeight="760">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="40,34,40,28" MaxWidth="1120">
+            <TextBlock Text="Início" Style="{StaticResource Text.PageTitle}" />
+            <TextBlock Text="Visão geral do catálogo carregado no B.T." Style="{StaticResource Text.PageSubtitle}" />
+
+            <!-- Pesquisa rápida -->
+            <StackPanel Margin="0,24,0,0" IsEnabled="{Binding HasCatalog}">
+                <TextBlock Text="Pesquisar tabela ou coluna" Style="{StaticResource Text.CardTitle}" />
+                <Grid Margin="0,10,0,0">
+                    <TextBox Style="{StaticResource TextBox.Search}" Height="56" Padding="0,0,150,0"
+                             Tag="Ex.: empregado, salario, nota fiscal"
+                             Text="{Binding QuickSearch, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Pesquisa rápida">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button HorizontalAlignment="Right" Margin="0,0,6,0" Command="{Binding SearchCommand}" Cursor="Hand"
+                            VerticalAlignment="Center" AutomationProperties.Name="Pesquisar">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Root" Height="44" CornerRadius="22" Padding="18,0,22,0" Background="{DynamicResource Brush.Accent}">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock x:Name="Icon" Text="&#xE721;" FontFamily="{DynamicResource Font.Icons}" FontSize="18"
+                                                   VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.OnAccent}" />
+                                        <TextBlock x:Name="Label" Text="Pesquisar" Margin="8,0,0,0" FontSize="15" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.OnAccent}" />
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Root" Property="Background" Value="{DynamicResource Brush.AccentHover}" />
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Root" Property="Background" Value="{DynamicResource Brush.Disabled.Background}" />
+                                        <Setter TargetName="Icon" Property="Foreground" Value="{DynamicResource Brush.Disabled.Text}" />
+                                        <Setter TargetName="Label" Property="Foreground" Value="{DynamicResource Brush.Disabled.Text}" />
+                                        <Setter Property="Cursor" Value="Arrow" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+                <TextBlock Text="Ignora maiúsculas e acentos. Com várias palavras, todas precisam aparecer no nome ou na descrição."
+                           Style="{StaticResource Text.Caption}" Margin="20,10,0,0" />
+            </StackPanel>
+
+            <!-- Atualizar o catálogo -->
+            <Border Style="{StaticResource Card}" Margin="0,20,0,0" Padding="8">
+                <StackPanel>
+                    <Border CornerRadius="4" Padding="28,24" Background="{DynamicResource Brush.SurfaceAlt}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="56" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Width="56" Height="56">
+                                <Ellipse Fill="{DynamicResource Brush.AccentSubtle}" />
+                                <TextBlock Text="&#xEE94;" Style="{StaticResource Text.Icon}" FontSize="26"
+                                           Foreground="{DynamicResource Brush.Accent}" HorizontalAlignment="Center" />
+                            </Grid>
+                            <StackPanel Grid.Column="1" Margin="22,0" VerticalAlignment="Center">
+                                <TextBlock Text="Catálogo do banco" Style="{StaticResource Text.SectionTitle}" FontSize="18" />
+                                <TextBlock Style="{StaticResource Text.Body}" Foreground="{DynamicResource Brush.Text.Secondary}"
+                                           Margin="0,3,0,0" MaxWidth="560" HorizontalAlignment="Left" LineHeight="20"
+                                           Text="Pesquise o catálogo fictício de demonstração ou exporte o de um banco próprio (coletor ODBC, desabilitado por padrão)." />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource Button.Ghost}" Command="{Binding OpenCatalogCommand}" Margin="0,0,8,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xED25;" Style="{StaticResource Text.Icon}" FontSize="16" />
+                                        <TextBlock Text="Abrir arquivo…" Margin="8,0,0,0" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource Button.Primary}" Padding="22,12" FontSize="15" Command="{Binding OpenCollectorCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE895;" Style="{StaticResource Text.Icon}" FontSize="17" />
+                                        <TextBlock Text="Atualizar catálogo" Margin="9,0,0,0" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <!-- Fluxo e garantia -->
+                    <Grid Margin="20,11,20,5">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Exportar catálogo" Style="{StaticResource Text.Caption}" FontSize="13" />
+                            <TextBlock Text="&#xE72A;" Style="{StaticResource Text.Icon}" FontSize="12" Margin="8,0"
+                                       Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                            <TextBlock Text="Pesquisar" Style="{StaticResource Text.Caption}" FontSize="13" />
+                            <TextBlock Text="&#xE72A;" Style="{StaticResource Text.Icon}" FontSize="12" Margin="8,0"
+                                       Foreground="{DynamicResource Brush.Text.Tertiary}" />
+                            <TextBlock Text="SELECT e contexto para IA" Style="{StaticResource Text.Caption}" FontSize="13" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Brush.Text.Primary}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBlock Text="&#xE73E;" Style="{StaticResource Text.Icon}" FontSize="13" Foreground="{DynamicResource Brush.Success}" />
+                            <TextBlock Text="Somente metadados: nenhum registro de cliente é lido" Style="{StaticResource Text.Caption}" FontSize="13" Margin="6,0,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Carregando -->
+            <Border Style="{StaticResource Card}" Margin="0,20,0,0" Padding="24,20"
+                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel Orientation="Horizontal">
+                    <controls:Spinner Width="22" Height="22" />
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Carregando catálogo…" Style="{StaticResource Text.CardTitle}" />
+                        <TextBlock Text="A leitura do catálogo completo leva alguns segundos." Style="{StaticResource Text.Caption}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Nenhum catálogo -->
+            <Border Style="{StaticResource Card}" Margin="0,20,0,0" Padding="28"
+                    Visibility="{Binding ShowEmptyState, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="&#xEE94;" Style="{StaticResource Text.Icon}" FontSize="30" HorizontalAlignment="Center"
+                               Foreground="{DynamicResource Brush.BorderStrong}" />
+                    <TextBlock Text="Nenhum catálogo carregado" Style="{StaticResource Text.CardTitle}" Margin="0,8,0,0" HorizontalAlignment="Center" />
+                    <TextBlock Text="Abra o catálogo fictício de demonstração ou um catalogo.json já exportado."
+                               Style="{StaticResource Text.Caption}" FontSize="13" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                    <Button Style="{StaticResource Button.Primary}" Padding="18,10" Margin="0,16,0,0" HorizontalAlignment="Center"
+                            Command="{Binding OpenDemoCatalogCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8A5;" Style="{StaticResource Text.Icon}" FontSize="16" />
+                            <TextBlock Text="Abrir catálogo de demonstração" Margin="9,0,0,0" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Catálogo em uso -->
+            <StackPanel Visibility="{Binding HasCatalog, Converter={StaticResource BoolToVisibility}}">
+                <ItemsControl ItemsSource="{Binding Metrics}" Margin="0,20,0,0" Focusable="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <controls:AdaptiveWrapPanel Spacing="16" RowSpacing="16" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="MinWidth" Value="220" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:CatalogMetric}">
+                            <Border Style="{StaticResource Card}" Padding="20,16">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Label}" Style="{StaticResource Text.Secondary}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Value}" Style="{StaticResource Text.Metric}" Margin="0,4,0,0" />
+                                    <TextBlock Text="{Binding Detail}" Style="{StaticResource Text.Caption}" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="0">
+                    <StackPanel>
+                        <Grid Margin="22,18,22,12">
+                            <TextBlock Text="Catálogo em uso" Style="{StaticResource Text.SectionTitle}" VerticalAlignment="Center" />
+                            <Button HorizontalAlignment="Right" Style="{StaticResource Button.Ghost}" FontSize="13" Command="{Binding RevealCatalogCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xED25;" Style="{StaticResource Text.Icon}" FontSize="14" />
+                                    <TextBlock Text="Mostrar arquivo" Margin="8,0,0,0" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding CatalogInfo}" Focusable="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:CatalogInfoRow}">
+                                    <Border BorderBrush="{DynamicResource Brush.SurfaceHover}" BorderThickness="0,1,0,0" Padding="22,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="200" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Label}" Style="{StaticResource Text.Secondary}" />
+                                            <TextBlock x:Name="Value" Grid.Column="1" Text="{Binding Value}" Style="{StaticResource Text.Body}"
+                                                       FontWeight="SemiBold" TextWrapping="Wrap" />
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsMono}" Value="True">
+                                            <Setter TargetName="Value" Property="FontFamily" Value="{DynamicResource Font.Mono}" />
+                                            <Setter TargetName="Value" Property="FontSize" Value="12" />
+                                            <Setter TargetName="Value" Property="FontWeight" Value="Normal" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Avisos da extração -->
+                        <ItemsControl ItemsSource="{Binding Warnings}" Focusable="False" Margin="22,4,22,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource Brush.WarningSubtle}" CornerRadius="4" Padding="12,8" Margin="0,0,0,8">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE7BA;" Style="{StaticResource Text.Icon}" FontSize="14" Foreground="{DynamicResource Brush.Warning}" />
+                                            <TextBlock Text="{Binding}" Margin="10,0,0,0" FontSize="13" Foreground="{DynamicResource Brush.Warning}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Style="{StaticResource Text.Caption}" Margin="22,6,22,16" TextWrapping="Wrap"
+                                   Text="O catálogo reflete o banco no momento da exportação. Chaves estrangeiras e regras de negócio não são extraídas." />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

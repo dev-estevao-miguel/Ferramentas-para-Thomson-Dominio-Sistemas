@@ -1,0 +1,43 @@
+<!-- Tema escuro: mesmas chaves do tema claro. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Superfícies -->
+    <SolidColorBrush x:Key="Brush.Background" Color="#121211" />
+    <SolidColorBrush x:Key="Brush.Surface" Color="#1B1A19" />
+    <SolidColorBrush x:Key="Brush.SurfaceAlt" Color="#201F1E" />
+    <SolidColorBrush x:Key="Brush.SurfaceHover" Color="#282725" />
+    <SolidColorBrush x:Key="Brush.Border" Color="#2F2D2B" />
+    <SolidColorBrush x:Key="Brush.BorderStrong" Color="#44413E" />
+    <SolidColorBrush x:Key="Brush.Track" Color="#2F2D2B" />
+
+    <!-- Texto -->
+    <SolidColorBrush x:Key="Brush.Text.Primary" Color="#EDEBE8" />
+    <SolidColorBrush x:Key="Brush.Text.Secondary" Color="#A8A49F" />
+    <SolidColorBrush x:Key="Brush.Text.Tertiary" Color="#85817B" />
+    <SolidColorBrush x:Key="Brush.Text.OnAccent" Color="#FFFFFF" />
+
+    <!-- Marca -->
+    <SolidColorBrush x:Key="Brush.Accent" Color="#D64000" />
+    <SolidColorBrush x:Key="Brush.AccentHover" Color="#E85A1A" />
+    <SolidColorBrush x:Key="Brush.AccentPressed" Color="#B83700" />
+    <SolidColorBrush x:Key="Brush.AccentSubtle" Color="#33201A" />
+
+    <!-- Estados -->
+    <SolidColorBrush x:Key="Brush.Success" Color="#4CB872" />
+    <SolidColorBrush x:Key="Brush.SuccessSubtle" Color="#16291C" />
+    <SolidColorBrush x:Key="Brush.Warning" Color="#F2B84B" />
+    <SolidColorBrush x:Key="Brush.WarningSubtle" Color="#362A15" />
+    <SolidColorBrush x:Key="Brush.Error" Color="#F0786B" />
+    <SolidColorBrush x:Key="Brush.ErrorSubtle" Color="#2E1A18" />
+    <SolidColorBrush x:Key="Brush.Info" Color="#6EA8FF" />
+    <SolidColorBrush x:Key="Brush.InfoSubtle" Color="#18243A" />
+
+    <!-- Barra lateral -->
+    <SolidColorBrush x:Key="Brush.Sidebar.Background" Color="#0E0E0D" />
+    <SolidColorBrush x:Key="Brush.Sidebar.Text" Color="#E4E1DD" />
+    <SolidColorBrush x:Key="Brush.Sidebar.TextMuted" Color="#6F6B66" />
+    <SolidColorBrush x:Key="Brush.Sidebar.ItemHover" Color="#1A1918" />
+    <SolidColorBrush x:Key="Brush.Sidebar.ItemSelected" Color="#22211F" />
+
+</ResourceDictionary>

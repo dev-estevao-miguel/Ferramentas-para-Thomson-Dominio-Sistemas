@@ -1,0 +1,53 @@
+# Build e IDEs
+bin/
+obj/
+publish/
+TestResults/
+.vs/
+.idea/
+*.user
+*.suo
+__pycache__/
+
+# VS Code: só as configurações de build/debug do projeto
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+*.ini
+
+# Logs
+*.log
+
+# Bancos, backups e dumps: nunca versionar dados reais
+*.db
+*.dom
+*.bak
+*.backup
+*.dump
+
+# Catálogos exportados de bancos reais (o catálogo fictício fica em samples/)
+catalogos/
+exportacoes/
+catalogo.json
+
+# Binários e material de terceiros
+*.jar
+*.zip
+legado/
+docs/analise/
+
+node_modules/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Backups dos projetos originais (nunca entram neste repositório)
+*_Original*
+_BACKUP_ORIGINAIS/

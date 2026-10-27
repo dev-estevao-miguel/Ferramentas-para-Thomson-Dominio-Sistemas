@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>BancoPronto.App</RootNamespace>
+    <AssemblyName>BancoPronto</AssemblyName>
+    <AssemblyTitle>Banco Pronto Demo</AssemblyTitle>
+    <ApplicationIcon>Resources\Branding\app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Ícone gerado por tools/Gerar-Icone.ps1 a partir do símbolo vetorial (Views/Controls/BrandLogo.xaml). -->
+    <Resource Include="Resources\Branding\*.ico" />
+    <!-- Source Sans 3 (SIL Open Font License, ver Resources/Fonts/LICENSE-SourceSans3.md) -->
+    <Resource Include="Resources\Fonts\*.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Backups fictícios usados pelo botão "Usar dados de demonstração". -->
+    <Content Include="..\..\samples\backups-demo\*.backup" LinkBase="samples\backups-demo"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BancoPronto.Core\BancoPronto.Core.csproj" />
+  </ItemGroup>
+
+</Project>
