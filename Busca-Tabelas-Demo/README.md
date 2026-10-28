@@ -123,7 +123,7 @@ As referências são utilizadas apenas para contextualizar o ambiente no qual a 
 
 ## Autor
 
-**Estevão Miguel** · TSCBr
+**Estevão dos Santos** · TSCBr
 
 [GitHub](https://github.com/dev-estevao-miguel) · [LinkedIn](https://www.linkedin.com/in/estev%C3%A3o-miguel-a22057171/)
 
